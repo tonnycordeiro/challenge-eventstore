@@ -1,8 +1,7 @@
 package net.intelie.challenges;
 
 import java.util.concurrent.ConcurrentHashMap;
-
-import net.intelie.challenges.collection.SortedDoublyLinkedList;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 /* The data structure ConcurrentHashMap was chosen due to the following reasons:  
  * - It's thread-safety
@@ -10,21 +9,20 @@ import net.intelie.challenges.collection.SortedDoublyLinkedList;
  * 	 by the event type (using a hash map).
  */
 public class ConcreteEventStore implements EventStore{
-	private volatile static ConcurrentHashMap<String, SortedDoublyLinkedList<Event>> eventCollection;
+	private volatile static ConcurrentHashMap<String, ConcurrentSkipListSet<Event>> eventCollection;
 	
 	/* A singleton pattern with a double-checked locking (assuming that there will be a lot of accesses to the object) was implemented because:  
 	 * - It's thread-safety
 	 * - To store the events in memory and to access them through an unique instance.
 	 */
-	public static ConcurrentHashMap<String, SortedDoublyLinkedList<Event>> getEventCollection(){
+	public static ConcurrentHashMap<String, ConcurrentSkipListSet<Event>> getEventCollection(){
 		if(eventCollection == null) {
 			synchronized(ConcreteEventStore.class){
 				if(eventCollection == null) {
-					eventCollection = new ConcurrentHashMap<String, SortedDoublyLinkedList<Event>>();
+					eventCollection = new ConcurrentHashMap<String, ConcurrentSkipListSet<Event>>();
 				}
 			}
 		}
-		
 		return eventCollection;
 	}
 	
@@ -36,9 +34,9 @@ public class ConcreteEventStore implements EventStore{
 	public void insert(Event event) {
 		if(event != null) {
 			if(!eventCollection.containsKey(event.type())) {
-				eventCollection.put(event.type(), new SortedDoublyLinkedList<Event>());
+				eventCollection.put(event.type(), new ConcurrentSkipListSet<Event>(new EventComparator()));
 			}
-			eventCollection.get(event.type()).insert(event);
+			eventCollection.get(event.type()).add(event);
 		}
 	}
 
@@ -47,9 +45,9 @@ public class ConcreteEventStore implements EventStore{
 		if(type != null)
 		{
 			if(eventCollection.containsKey(type)) {
-				SortedDoublyLinkedList<Event> list = eventCollection.get(type);
+				ConcurrentSkipListSet<Event> list = eventCollection.get(type);
 				eventCollection.remove(type);
-				list.removeAll();
+				list.clear();
 			}
 		}
 	}

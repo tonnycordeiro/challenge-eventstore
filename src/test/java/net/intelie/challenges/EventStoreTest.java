@@ -101,7 +101,7 @@ public class EventStoreTest {
 			while(iterator.moveNext()) {
 	        	count++;
 	        	currentEvent = iterator.current();
-	        	if(currentEvent.compareTo(previousEvent) < 0) {
+	        	if(new EventComparator().compare(currentEvent,previousEvent) < 0) {
 	        		isOrdered = false;
 	        		break;
 	        	}
@@ -111,7 +111,7 @@ public class EventStoreTest {
 		}
 
         assertEquals(ConcreteEventStore.getEventCollection().size(), 2);
-        assertEquals(count, 6);
+        assertEquals(count, 5);
         assertTrue(isOrdered);
 	}	
 	
@@ -148,7 +148,7 @@ public class EventStoreTest {
 		}
         
         assertEquals(ConcreteEventStore.getEventCollection().size(), 2);
-        assertEquals(count, 7);
+        assertEquals(count, 6);
         assertEquals(expectedHeadEvent, actualHeadEvent);
 	}		
 	
@@ -177,7 +177,7 @@ public class EventStoreTest {
         try(ConcreteEventIterator iterator = (ConcreteEventIterator)evtStore.query(TYPE_1, MIN_TIME_STAMP, MAX_TIME_STAMP)){
             while(iterator.moveNext()) {
             	count++;
-            	if(count == 7) {
+            	if(count == 6) {
             		actualLastEvent = iterator.current();
             	}
             }
@@ -186,7 +186,7 @@ public class EventStoreTest {
 		}
         
         assertEquals(ConcreteEventStore.getEventCollection().size(), 2);
-        assertEquals(count, 7);
+        assertEquals(count, 6);
         assertEquals(expectedLastEvent, actualLastEvent);
 	}		
 	
@@ -370,7 +370,7 @@ public class EventStoreTest {
 		}
         
         assertEquals(ConcreteEventStore.getEventCollection().size(), 1);
-        assertEquals(count, 7);
+        assertEquals(count, 6);
         assertEquals(expectedEvent, actualEvent);
 	}		
 	
@@ -400,7 +400,7 @@ public class EventStoreTest {
         try(ConcreteEventIterator iterator = (ConcreteEventIterator)evtStore.query(TYPE_1, MIN_TIME_STAMP, MAX_TIME_STAMP)){
             while(iterator.moveNext()) {
             	count++;
-            	if(count == 8) {
+            	if(count == 7) {
             		actualEvent = iterator.current();
             		iterator.remove();
             	}
@@ -410,7 +410,7 @@ public class EventStoreTest {
 		}
         
         assertEquals(ConcreteEventStore.getEventCollection().size(), 1);
-        assertEquals(count, 8);
+        assertEquals(count, 7);
         assertEquals(expectedEvent, actualEvent);
 	}		
 	
@@ -421,7 +421,6 @@ public class EventStoreTest {
 		
 		ArrayList<Event> eventList = new ArrayList<>(List.of(
 				new Event(TYPE_1, 123L), 
-				new Event(TYPE_1, 1234L),
 				new Event(TYPE_1, 1234L),
 				new Event(TYPE_1, 322L),
 				new Event(TYPE_1, 122123L),
@@ -447,7 +446,7 @@ public class EventStoreTest {
 
         assertEquals(ConcreteEventStore.getEventCollection().size(), 1);
         assertEquals(eventList.size(), 0);
-        assertEquals(count, 7);
+        assertEquals(count, 6);
 	}
 	
 	@Test
@@ -536,7 +535,6 @@ public class EventStoreTest {
 		ArrayList<Event> eventList = new ArrayList<>(List.of(
 				new Event(TYPE_1, 123L), 
 				new Event(TYPE_1, 1234L),
-				new Event(TYPE_1, 1234L),
 				new Event(TYPE_2, 322L),
 				new Event(TYPE_1, 122123L),
 				new Event(TYPE_1, 11L),
@@ -588,7 +586,6 @@ public class EventStoreTest {
 		boolean isIllegalStateException = false;
 		ArrayList<Event> eventList = new ArrayList<>(List.of(
 				new Event(TYPE_1, 123L), 
-				new Event(TYPE_1, 1234L),
 				new Event(TYPE_1, 1234L),
 				new Event(TYPE_2, 322L),
 				new Event(TYPE_1, 122123L),

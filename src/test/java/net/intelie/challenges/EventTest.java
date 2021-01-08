@@ -23,9 +23,9 @@ public class EventTest {
         Event event3 = new Event("some_type", 123L);
         Event event4 = new Event("some_type", 1234L);
 
-        assertTrue(event1.compareTo(event2)<0);
-        assertTrue(event2.compareTo(event3)==0);
-        assertTrue(event4.compareTo(event3)>0);
+        assertTrue(new EventComparator().compare(event1,event2)<0);
+        assertTrue(new EventComparator().compare(event2,event3)==0);
+        assertTrue(new EventComparator().compare(event4,event3)>0);
     }
     
 }
